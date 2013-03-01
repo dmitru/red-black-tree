@@ -62,6 +62,8 @@ void btree_destroy(BTree *tree);
 
 int btree_height(BTree *tree);
 
-void btree_dump(BTree *tree);
+void btree_dump(BTree *tree, char* (*dump_node)(Node *n));
+
+void btree_dump_dot(BTree *tree, char* (*dot_node_attributes)(Node *));
 
 #endif  // BTREE

@@ -19,6 +19,40 @@ int int_compare (void *va, void *vb)
   return *a - *b;
 }
 
+#define COLOR(node) (((node) == NULL)? BTREE_BLACK : (node)->color)
+
+static bool is_correct_rb_tree(Node *n)
+{
+  if (COLOR(n) == BTREE_RED) {
+    if (COLOR(n->left) == BTREE_RED || COLOR(n->right) == BTREE_RED)
+      return false;
+  } else {
+    if (n == NULL)
+      return true;
+  }
+  return is_correct_rb_tree(n->left) && is_correct_rb_tree(n->right);
+}
+
+static char* node_attrs(Node *n)
+{
+  const size_t buf_sz = 1024;
+  static char attr_str[buf_sz];
+  snprintf(attr_str, buf_sz, "[label=\"%d\", style=filled, color=%s]",
+    *(int*)(n->data), (n->color == BTREE_RED)? "red" : "gray");
+  return attr_str;
+}
+
+static char* node_dump(Node *n)
+{
+  const size_t buf_sz = 1024;
+  static char str[buf_sz];
+  if (n != NULL)
+    snprintf(str, buf_sz, "%3d%c", *(int*)(n->data), (n->color == BTREE_RED)? 'r' : 'b');
+  else
+    snprintf(str, buf_sz, "NILb");
+  return str;
+}
+
 TEST(BalancedTreeTests, CreateDestroyTest) {
   BTree *tree = btree_create(int_compare);
   EXPECT_TRUE(btree_isempty(tree));
@@ -111,15 +145,65 @@ TEST(BalancedTreeTests, IteratorTest2) {
 TEST(BalancedTreeTests, TreeHeightTest) {
   srand(time(NULL));
   BTree *tree = btree_create(int_compare);
-  const int n = 100;
+  const int n = 10000;
   int a[n];
   for (int i = 0; i < n; ++i) {
-    a[i] = i;
+    a[i] = rand() % 10000;
     btree_insert(tree, (void*)&a[i]);
   }
   int expected_height = 2 * ceil(log(n + 1) / log(2)) + 1;
-  DUMP("%d, %d\n", btree_height(tree), expected_height);
+  DUMP("Tree height: %d, theoretical upper bound: %d\n", btree_height(tree), expected_height);
   EXPECT_TRUE(btree_height(tree) < expected_height);
   btree_destroy(tree);
 }
 
+TEST(BalancedTreeTests, TreeDumpTest) {
+  srand(time(NULL));
+  BTree *tree = btree_create(int_compare);
+  const int n = 10;
+  int a[n];
+  for (int i = 0; i < n; ++i) {
+    a[i] = rand() % 10000;
+    btree_insert(tree, (void*)&a[i]);
+  }
+  btree_dump(tree, node_dump);
+  btree_dump_dot(tree, node_attrs);
+}
+
+TEST(BalancedTreeTests, RedBlackPropertiesTest) {
+  srand(time(NULL));
+  BTree *tree = btree_create(int_compare);
+
+  const int n = 10000;
+  int a[n];
+  for (int i = 0; i < n; ++i) {
+    a[i] = rand() % 100000;
+    btree_insert(tree, (void*)&a[i]);
+  }
+
+  Node *root = tree->root;
+  EXPECT_EQ(root->color, BTREE_BLACK);
+  EXPECT_TRUE(is_correct_rb_tree(root));
+}
+
+TEST(BalancedTreeTests, InsertRemoveMemberTest3) {
+  srand(time(NULL));
+  BTree *tree = btree_create(int_compare);
+
+  const int n = 10000;
+  int a[n];
+  for (int i = 0; i < n; ++i) {
+    a[i] = rand() % 10000;
+    btree_insert(tree, (void*)&a[i]);
+  }
+
+  for (int i = 0; i < n / 2; ++i) {
+    btree_remove(btree_find(tree, (void*)&a[i]));
+  }
+
+  Node *root = tree->root;
+  EXPECT_EQ(root->color, BTREE_BLACK);
+  int expected_height = 2 * ceil(log(n + 1) / log(2)) + 1;
+  EXPECT_TRUE(btree_height(tree) < expected_height);
+  EXPECT_TRUE(is_correct_rb_tree(root));
+}

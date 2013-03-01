@@ -12,6 +12,7 @@
 #define DUMP(format, ...) 
 #endif
 
+#define TOINT(x) ((x == NULL)? -1 : *((int*)(x)->data))
 #define COLOR(node) (((node) == NULL)? BTREE_BLACK : (node)->color)
 
 BTree* btree_create(int (*cmp) (void *, void *))
@@ -29,10 +30,20 @@ bool btree_isempty(BTree *t)
   return t->root == NULL;
 }
 
+/*static char* node_dump(Node *n)
+{
+  const size_t buf_sz = 1024;
+  static char str[buf_sz];
+  if (n != NULL)
+    snprintf(str, buf_sz, "%3d%c", *(int*)(n->data), (n->color == BTREE_RED)? 'r' : 'b');
+  else
+    snprintf(str, buf_sz, "NILb"  );
+  return str;
+}*/
+
+
 static Node* insert_helper(BTree *t, Node **node, Node *parent, void *data)
 {
-  DUMP("insert_helper(%d)\n", *(int*)data);
-
   if ((*node) == NULL) {
     Node *new_node = (Node*)malloc(sizeof(Node)); 
     if (new_node == NULL) 
@@ -58,7 +69,7 @@ static Node* insert_helper(BTree *t, Node **node, Node *parent, void *data)
   } 
   int cmp_result = (*(t->cmp))(data, (*node)->data);
   if (cmp_result == 0) {
-    return *node;
+    return NULL;
   } else if (cmp_result > 0) {
     return insert_helper(t, &((*node)->right), *node, data);
   } else {
@@ -68,7 +79,6 @@ static Node* insert_helper(BTree *t, Node **node, Node *parent, void *data)
 
 static void left_rotation(BTree *tree, Node *x)
 {
-  DUMP("left_rotation()\n");
   Node *y = x->right;
   x->right = y->left;
   if (y->left != NULL) 
@@ -88,7 +98,6 @@ static void left_rotation(BTree *tree, Node *x)
 
 static void right_rotation(BTree *tree, Node *y)
 {
-  DUMP("right_rotation()\n");
   Node *x = y->left;
   y->left = x->right;
   if (x->right != NULL) 
@@ -106,23 +115,16 @@ static void right_rotation(BTree *tree, Node *y)
   y->parent = x;
 }
 
-// TODO: DEBUG HERE
 bool btree_insert(BTree *tree, void *data)
-{
-  DUMP("btree_insert(%d)\n", *(int*)data);
- 
+{ 
   Node *x = NULL;
   if ((x = insert_helper(tree, &tree->root, NULL, data)) == NULL)
     return false;
   x->color = BTREE_RED;
-  while (x != tree->root && COLOR(x->parent) == BTREE_RED) {
-    DUMP("ok_while_begin\n");
-    DUMP("root: %p, x: %p, p: %p\n", tree->root, x, x->parent);
-   // btree_dump(tree);
+  while (COLOR(x->parent) == BTREE_RED) {
     Node *p = x->parent;
     Node *pp = p->parent;
     if (p == pp->left) {
-      //DUMP("ok_first_branch\n");
       Node *y = pp->right;
       if (COLOR(y) == BTREE_RED) {
         p->color = BTREE_BLACK;
@@ -133,15 +135,14 @@ bool btree_insert(BTree *tree, void *data)
         if (x == p->right) {
           x = x->parent;
           left_rotation(tree, x);
+          p = x->parent;
+          pp = p->parent;
         }
-        DUMP("root: %p, x: %p, p: %p\n", tree->root, x, x->parent);
         p->color = BTREE_BLACK;
         pp->color = BTREE_RED;
         right_rotation(tree, pp);
-        DUMP("root: %p, x: %p, p: %p\n", tree->root, x, x->parent);
       } 
     } else {
-      //DUMP("ok_second_branch\n");
       Node *y = pp->left;
       if (COLOR(y) == BTREE_RED) {
         p->color = BTREE_BLACK;
@@ -150,17 +151,16 @@ bool btree_insert(BTree *tree, void *data)
         x = pp;
       } else {
         if (x == p->left) {
-          x = x->parent;
+          x = p;
           right_rotation(tree, x);
+          p = x->parent;
+          pp = p->parent;
         }
-        DUMP("root: %p, x: %p, p: %p\n", tree->root, x, x->parent);
         p->color = BTREE_BLACK;
         pp->color = BTREE_RED;
         left_rotation(tree, pp);
-        DUMP("root: %p, x: %p, p: %p\n", tree->root, x, x->parent);
       } 
     }
-    //break;
   }
   tree->root->color = BTREE_BLACK;
   return true;
@@ -339,7 +339,7 @@ int btree_height(BTree *tree)
   return btree_height_helper(tree->root);
 }
 
-static void dump_helper(Node *n)
+static void dump_dot_helper(Node *n, char* (*dot_node_attributes)(Node *n))
 {
   if (n == NULL)
     return;
@@ -350,17 +350,33 @@ static void dump_helper(Node *n)
     printf("\"%p\" -> \"%p\"\n", n, n->right);
   }
   if (n->color == BTREE_BLACK) {
-    printf("\"%p\" [label=%d, style=filled, fillcolor=gray]\n", n, *(int*)(n->data));
+    printf("\"%p\" %s\n", n, dot_node_attributes(n));
   } else {
-    printf("\"%p\" [label=%d, style=filled, fillcolor=red]\n", n, *(int*)(n->data));
+    printf("\"%p\" %s\n", n, dot_node_attributes(n));
   }
-  dump_helper(n->left);
-  dump_helper(n->right);
+  dump_dot_helper(n->left, dot_node_attributes);
+  dump_dot_helper(n->right, dot_node_attributes);
 }
 
-void btree_dump(BTree *tree)
+void btree_dump_dot(BTree *tree, char* (*dot_node_attributes)(Node *n))
 {
   printf("digraph {\n");
-  dump_helper(tree->root);
+  dump_dot_helper(tree->root, dot_node_attributes);
   printf("}");
+}
+
+void dump_helper(Node *n, int indent, char* (*dump_node)(Node *n))
+{
+  if (n != NULL)
+    dump_helper(n->right, indent + 4, dump_node);
+  for (int i = 0; i < indent; ++i)
+    putchar(' ');
+  printf("%s\n", dump_node(n));
+  if (n != NULL)
+    dump_helper(n->left, indent + 4, dump_node);
+}
+
+void btree_dump(BTree *tree, char* (*dump_node)(Node *n))
+{
+  dump_helper(tree->root, 0, dump_node);
 }

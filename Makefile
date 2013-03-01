@@ -13,6 +13,7 @@ CPPFLAGS += -I$(GTEST_DIR)/include -I$(GTEST_DIR) -I/usr/include/c++/4.6/x86_64-
 CXXFLAGS += -g -Wall -Wextra -pthread -fprofile-arcs -ftest-coverage -DDEBUG
 
 TEST_BIN = ./btree_tests
+DRAW_BIN = ./draw
 
 all: tests
 	$(TEST_BIN)
@@ -48,11 +49,16 @@ help:
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $^ -o $@
 
 clean:
-	rm -f *.o coverage_results $(TEST_BIN) $(COV_DIR)
+	rm -rf *.o coverage_results $(TEST_BIN) $(DRAW_BIN)
+	rm -rf $(COV_DIR) 
+	rm -rf ./*.dot
+	rm -rf ./*.png
+	rm -rf ./*.gcda ./*gcno
 
-draw: draw_tree.o btree.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o draw draw_tree.o btree.o
-	./draw 3 > tree.dot
+# make draw - render a random tree in a png file
+draw: draw_tree.o btree.o 
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $(DRAW_BIN) draw_tree.o btree.o
+	./draw 1000 > tree.dot
 	dot -Tpng ./tree.dot > tree.png
 
 draw_tree.o: draw_tree.c
