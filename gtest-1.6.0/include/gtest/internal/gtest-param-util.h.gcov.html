@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - coverage_results - gtest-1.6.0/include/gtest/internal/gtest-param-util.h</title>
+  <link rel="stylesheet" type="text/css" href="../../../../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../../../../index.html">top level</a> - <a href="index.html">gtest-1.6.0/include/gtest/internal</a> - gtest-param-util.h<span style="font-size: 80%;"> (source / <a href="gtest-param-util.h.func.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">coverage_results</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2013-02-20</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">20</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="headerItem">Branches:</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">32</td>
+            <td class="headerCovTableEntryLo">0.0 %</td>
+          </tr>
+          <tr><td><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">           Branch data     Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>                :            : // Copyright 2008 Google Inc.</a>
+<span class="lineNum">       2 </span>                :            : // All Rights Reserved.
+<span class="lineNum">       3 </span>                :            : //
+<span class="lineNum">       4 </span>                :            : // Redistribution and use in source and binary forms, with or without
+<span class="lineNum">       5 </span>                :            : // modification, are permitted provided that the following conditions are
+<span class="lineNum">       6 </span>                :            : // met:
+<span class="lineNum">       7 </span>                :            : //
+<span class="lineNum">       8 </span>                :            : //     * Redistributions of source code must retain the above copyright
+<span class="lineNum">       9 </span>                :            : // notice, this list of conditions and the following disclaimer.
+<span class="lineNum">      10 </span>                :            : //     * Redistributions in binary form must reproduce the above
+<span class="lineNum">      11 </span>                :            : // copyright notice, this list of conditions and the following disclaimer
+<span class="lineNum">      12 </span>                :            : // in the documentation and/or other materials provided with the
+<span class="lineNum">      13 </span>                :            : // distribution.
+<span class="lineNum">      14 </span>                :            : //     * Neither the name of Google Inc. nor the names of its
+<span class="lineNum">      15 </span>                :            : // contributors may be used to endorse or promote products derived from
+<span class="lineNum">      16 </span>                :            : // this software without specific prior written permission.
+<span class="lineNum">      17 </span>                :            : //
+<span class="lineNum">      18 </span>                :            : // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+<span class="lineNum">      19 </span>                :            : // &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+<span class="lineNum">      20 </span>                :            : // LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+<span class="lineNum">      21 </span>                :            : // A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+<span class="lineNum">      22 </span>                :            : // OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+<span class="lineNum">      23 </span>                :            : // SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+<span class="lineNum">      24 </span>                :            : // LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+<span class="lineNum">      25 </span>                :            : // DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+<span class="lineNum">      26 </span>                :            : // THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+<span class="lineNum">      27 </span>                :            : // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+<span class="lineNum">      28 </span>                :            : // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+<span class="lineNum">      29 </span>                :            : //
+<span class="lineNum">      30 </span>                :            : // Author: vladl@google.com (Vlad Losev)
+<span class="lineNum">      31 </span>                :            : 
+<span class="lineNum">      32 </span>                :            : // Type and function utilities for implementing parameterized tests.
+<span class="lineNum">      33 </span>                :            : 
+<span class="lineNum">      34 </span>                :            : #ifndef GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
+<span class="lineNum">      35 </span>                :            : #define GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
+<span class="lineNum">      36 </span>                :            : 
+<span class="lineNum">      37 </span>                :            : #include &lt;iterator&gt;
+<span class="lineNum">      38 </span>                :            : #include &lt;utility&gt;
+<span class="lineNum">      39 </span>                :            : #include &lt;vector&gt;
+<span class="lineNum">      40 </span>                :            : 
+<span class="lineNum">      41 </span>                :            : // scripts/fuse_gtest.py depends on gtest's own header being #included
+<span class="lineNum">      42 </span>                :            : // *unconditionally*.  Therefore these #includes cannot be moved
+<span class="lineNum">      43 </span>                :            : // inside #if GTEST_HAS_PARAM_TEST.
+<span class="lineNum">      44 </span>                :            : #include &quot;gtest/internal/gtest-internal.h&quot;
+<span class="lineNum">      45 </span>                :            : #include &quot;gtest/internal/gtest-linked_ptr.h&quot;
+<span class="lineNum">      46 </span>                :            : #include &quot;gtest/internal/gtest-port.h&quot;
+<span class="lineNum">      47 </span>                :            : #include &quot;gtest/gtest-printers.h&quot;
+<span class="lineNum">      48 </span>                :            : 
+<span class="lineNum">      49 </span>                :            : #if GTEST_HAS_PARAM_TEST
+<span class="lineNum">      50 </span>                :            : 
+<span class="lineNum">      51 </span>                :            : namespace testing {
+<span class="lineNum">      52 </span>                :            : namespace internal {
+<span class="lineNum">      53 </span>                :            : 
+<span class="lineNum">      54 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">      55 </span>                :            : //
+<span class="lineNum">      56 </span>                :            : // Outputs a message explaining invalid registration of different
+<span class="lineNum">      57 </span>                :            : // fixture class for the same test case. This may happen when
+<span class="lineNum">      58 </span>                :            : // TEST_P macro is used to define two tests with the same name
+<span class="lineNum">      59 </span>                :            : // but in different namespaces.
+<span class="lineNum">      60 </span>                :            : GTEST_API_ void ReportInvalidTestCaseType(const char* test_case_name,
+<span class="lineNum">      61 </span>                :            :                                           const char* file, int line);
+<span class="lineNum">      62 </span>                :            : 
+<span class="lineNum">      63 </span>                :            : template &lt;typename&gt; class ParamGeneratorInterface;
+<span class="lineNum">      64 </span>                :            : template &lt;typename&gt; class ParamGenerator;
+<span class="lineNum">      65 </span>                :            : 
+<span class="lineNum">      66 </span>                :            : // Interface for iterating over elements provided by an implementation
+<a name="67"><span class="lineNum">      67 </span>                :            : // of ParamGeneratorInterface&lt;T&gt;.</a>
+<span class="lineNum">      68 </span>                :            : template &lt;typename T&gt;
+<a name="69"><span class="lineNum">      69 </span>                :<span class="lineNoCov">          0 : class ParamIteratorInterface {</span></a>
+<span class="lineNum">      70 </span>                :            :  public:
+<span class="lineNum">      71 </span>        [<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :   virtual ~ParamIteratorInterface() {}</span>
+<span class="lineNum">      72 </span>                :            :   // A pointer to the base generator instance.
+<span class="lineNum">      73 </span>                :            :   // Used only for the purposes of iterator comparison
+<span class="lineNum">      74 </span>                :            :   // to make sure that two iterators belong to the same generator.
+<span class="lineNum">      75 </span>                :            :   virtual const ParamGeneratorInterface&lt;T&gt;* BaseGenerator() const = 0;
+<span class="lineNum">      76 </span>                :            :   // Advances iterator to point to the next element
+<span class="lineNum">      77 </span>                :            :   // provided by the generator. The caller is responsible
+<span class="lineNum">      78 </span>                :            :   // for not calling Advance() on an iterator equal to
+<span class="lineNum">      79 </span>                :            :   // BaseGenerator()-&gt;End().
+<span class="lineNum">      80 </span>                :            :   virtual void Advance() = 0;
+<span class="lineNum">      81 </span>                :            :   // Clones the iterator object. Used for implementing copy semantics
+<span class="lineNum">      82 </span>                :            :   // of ParamIterator&lt;T&gt;.
+<span class="lineNum">      83 </span>                :            :   virtual ParamIteratorInterface* Clone() const = 0;
+<span class="lineNum">      84 </span>                :            :   // Dereferences the current iterator and provides (read-only) access
+<span class="lineNum">      85 </span>                :            :   // to the pointed value. It is the caller's responsibility not to call
+<span class="lineNum">      86 </span>                :            :   // Current() on an iterator equal to BaseGenerator()-&gt;End().
+<span class="lineNum">      87 </span>                :            :   // Used for implementing ParamGenerator&lt;T&gt;::operator*().
+<span class="lineNum">      88 </span>                :            :   virtual const T* Current() const = 0;
+<span class="lineNum">      89 </span>                :            :   // Determines whether the given iterator and other point to the same
+<span class="lineNum">      90 </span>                :            :   // element in the sequence generated by the generator.
+<span class="lineNum">      91 </span>                :            :   // Used for implementing ParamGenerator&lt;T&gt;::operator==().
+<span class="lineNum">      92 </span>                :            :   virtual bool Equals(const ParamIteratorInterface&amp; other) const = 0;
+<span class="lineNum">      93 </span>                :            : };
+<span class="lineNum">      94 </span>                :            : 
+<span class="lineNum">      95 </span>                :            : // Class iterating over elements provided by an implementation of
+<span class="lineNum">      96 </span>                :            : // ParamGeneratorInterface&lt;T&gt;. It wraps ParamIteratorInterface&lt;T&gt;
+<span class="lineNum">      97 </span>                :            : // and implements the const forward iterator concept.
+<span class="lineNum">      98 </span>                :            : template &lt;typename T&gt;
+<span class="lineNum">      99 </span>                :            : class ParamIterator {
+<span class="lineNum">     100 </span>                :            :  public:
+<span class="lineNum">     101 </span>                :            :   typedef T value_type;
+<span class="lineNum">     102 </span>                :            :   typedef const T&amp; reference;
+<span class="lineNum">     103 </span>                :            :   typedef ptrdiff_t difference_type;
+<span class="lineNum">     104 </span>                :            : 
+<span class="lineNum">     105 </span>                :            :   // ParamIterator assumes ownership of the impl_ pointer.
+<span class="lineNum">     106 </span>                :            :   ParamIterator(const ParamIterator&amp; other) : impl_(other.impl_-&gt;Clone()) {}
+<span class="lineNum">     107 </span>                :            :   ParamIterator&amp; operator=(const ParamIterator&amp; other) {
+<span class="lineNum">     108 </span>                :            :     if (this != &amp;other)
+<span class="lineNum">     109 </span>                :            :       impl_.reset(other.impl_-&gt;Clone());
+<span class="lineNum">     110 </span>                :            :     return *this;
+<span class="lineNum">     111 </span>                :            :   }
+<span class="lineNum">     112 </span>                :            : 
+<span class="lineNum">     113 </span>                :            :   const T&amp; operator*() const { return *impl_-&gt;Current(); }
+<span class="lineNum">     114 </span>                :            :   const T* operator-&gt;() const { return impl_-&gt;Current(); }
+<span class="lineNum">     115 </span>                :            :   // Prefix version of operator++.
+<span class="lineNum">     116 </span>                :            :   ParamIterator&amp; operator++() {
+<span class="lineNum">     117 </span>                :            :     impl_-&gt;Advance();
+<span class="lineNum">     118 </span>                :            :     return *this;
+<span class="lineNum">     119 </span>                :            :   }
+<span class="lineNum">     120 </span>                :            :   // Postfix version of operator++.
+<span class="lineNum">     121 </span>                :            :   ParamIterator operator++(int /*unused*/) {
+<span class="lineNum">     122 </span>                :            :     ParamIteratorInterface&lt;T&gt;* clone = impl_-&gt;Clone();
+<span class="lineNum">     123 </span>                :            :     impl_-&gt;Advance();
+<span class="lineNum">     124 </span>                :            :     return ParamIterator(clone);
+<span class="lineNum">     125 </span>                :            :   }
+<span class="lineNum">     126 </span>                :            :   bool operator==(const ParamIterator&amp; other) const {
+<span class="lineNum">     127 </span>                :            :     return impl_.get() == other.impl_.get() || impl_-&gt;Equals(*other.impl_);
+<span class="lineNum">     128 </span>                :            :   }
+<span class="lineNum">     129 </span>                :            :   bool operator!=(const ParamIterator&amp; other) const {
+<span class="lineNum">     130 </span>                :            :     return !(*this == other);
+<span class="lineNum">     131 </span>                :            :   }
+<span class="lineNum">     132 </span>                :            : 
+<span class="lineNum">     133 </span>                :            :  private:
+<span class="lineNum">     134 </span>                :            :   friend class ParamGenerator&lt;T&gt;;
+<span class="lineNum">     135 </span>                :            :   explicit ParamIterator(ParamIteratorInterface&lt;T&gt;* impl) : impl_(impl) {}
+<span class="lineNum">     136 </span>                :            :   scoped_ptr&lt;ParamIteratorInterface&lt;T&gt; &gt; impl_;
+<span class="lineNum">     137 </span>                :            : };
+<span class="lineNum">     138 </span>                :            : 
+<span class="lineNum">     139 </span>                :            : // ParamGeneratorInterface&lt;T&gt; is the binary interface to access generators
+<span class="lineNum">     140 </span>                :            : // defined in other translation units.
+<span class="lineNum">     141 </span>                :            : template &lt;typename T&gt;
+<span class="lineNum">     142 </span>                :            : class ParamGeneratorInterface {
+<span class="lineNum">     143 </span>                :            :  public:
+<a name="144"><span class="lineNum">     144 </span>                :            :   typedef T ParamType;</a>
+<span class="lineNum">     145 </span>                :            : 
+<span class="lineNum">     146 </span>        [<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :   virtual ~ParamGeneratorInterface() {}</span>
+<span class="lineNum">     147 </span>                :            : 
+<span class="lineNum">     148 </span>                :            :   // Generator interface definition
+<span class="lineNum">     149 </span>                :            :   virtual ParamIteratorInterface&lt;T&gt;* Begin() const = 0;
+<span class="lineNum">     150 </span>                :            :   virtual ParamIteratorInterface&lt;T&gt;* End() const = 0;
+<span class="lineNum">     151 </span>                :            : };
+<span class="lineNum">     152 </span>                :            : 
+<span class="lineNum">     153 </span>                :            : // Wraps ParamGeneratorInterface&lt;T&gt; and provides general generator syntax
+<span class="lineNum">     154 </span>                :            : // compatible with the STL Container concept.
+<span class="lineNum">     155 </span>                :            : // This class implements copy initialization semantics and the contained
+<span class="lineNum">     156 </span>                :            : // ParamGeneratorInterface&lt;T&gt; instance is shared among all copies
+<span class="lineNum">     157 </span>                :            : // of the original object. This is possible because that instance is immutable.
+<span class="lineNum">     158 </span>                :            : template&lt;typename T&gt;
+<span class="lineNum">     159 </span>                :            : class ParamGenerator {
+<span class="lineNum">     160 </span>                :            :  public:
+<span class="lineNum">     161 </span>                :            :   typedef ParamIterator&lt;T&gt; iterator;
+<span class="lineNum">     162 </span>                :            : 
+<span class="lineNum">     163 </span>                :            :   explicit ParamGenerator(ParamGeneratorInterface&lt;T&gt;* impl) : impl_(impl) {}
+<span class="lineNum">     164 </span>                :            :   ParamGenerator(const ParamGenerator&amp; other) : impl_(other.impl_) {}
+<span class="lineNum">     165 </span>                :            : 
+<span class="lineNum">     166 </span>                :            :   ParamGenerator&amp; operator=(const ParamGenerator&amp; other) {
+<span class="lineNum">     167 </span>                :            :     impl_ = other.impl_;
+<span class="lineNum">     168 </span>                :            :     return *this;
+<span class="lineNum">     169 </span>                :            :   }
+<span class="lineNum">     170 </span>                :            : 
+<span class="lineNum">     171 </span>                :            :   iterator begin() const { return iterator(impl_-&gt;Begin()); }
+<span class="lineNum">     172 </span>                :            :   iterator end() const { return iterator(impl_-&gt;End()); }
+<span class="lineNum">     173 </span>                :            : 
+<span class="lineNum">     174 </span>                :            :  private:
+<span class="lineNum">     175 </span>                :            :   linked_ptr&lt;const ParamGeneratorInterface&lt;T&gt; &gt; impl_;
+<span class="lineNum">     176 </span>                :            : };
+<span class="lineNum">     177 </span>                :            : 
+<span class="lineNum">     178 </span>                :            : // Generates values from a range of two comparable values. Can be used to
+<span class="lineNum">     179 </span>                :            : // generate sequences of user-defined types that implement operator+() and
+<span class="lineNum">     180 </span>                :            : // operator&lt;().
+<span class="lineNum">     181 </span>                :            : // This class is used in the Range() function.
+<span class="lineNum">     182 </span>                :            : template &lt;typename T, typename IncrementT&gt;
+<span class="lineNum">     183 </span>                :            : class RangeGenerator : public ParamGeneratorInterface&lt;T&gt; {
+<span class="lineNum">     184 </span>                :            :  public:
+<span class="lineNum">     185 </span>                :            :   RangeGenerator(T begin, T end, IncrementT step)
+<span class="lineNum">     186 </span>                :            :       : begin_(begin), end_(end),
+<span class="lineNum">     187 </span>                :            :         step_(step), end_index_(CalculateEndIndex(begin, end, step)) {}
+<span class="lineNum">     188 </span>                :            :   virtual ~RangeGenerator() {}
+<span class="lineNum">     189 </span>                :            : 
+<span class="lineNum">     190 </span>                :            :   virtual ParamIteratorInterface&lt;T&gt;* Begin() const {
+<span class="lineNum">     191 </span>                :            :     return new Iterator(this, begin_, 0, step_);
+<span class="lineNum">     192 </span>                :            :   }
+<span class="lineNum">     193 </span>                :            :   virtual ParamIteratorInterface&lt;T&gt;* End() const {
+<span class="lineNum">     194 </span>                :            :     return new Iterator(this, end_, end_index_, step_);
+<span class="lineNum">     195 </span>                :            :   }
+<span class="lineNum">     196 </span>                :            : 
+<span class="lineNum">     197 </span>                :            :  private:
+<span class="lineNum">     198 </span>                :            :   class Iterator : public ParamIteratorInterface&lt;T&gt; {
+<span class="lineNum">     199 </span>                :            :    public:
+<span class="lineNum">     200 </span>                :            :     Iterator(const ParamGeneratorInterface&lt;T&gt;* base, T value, int index,
+<span class="lineNum">     201 </span>                :            :              IncrementT step)
+<span class="lineNum">     202 </span>                :            :         : base_(base), value_(value), index_(index), step_(step) {}
+<span class="lineNum">     203 </span>                :            :     virtual ~Iterator() {}
+<span class="lineNum">     204 </span>                :            : 
+<span class="lineNum">     205 </span>                :            :     virtual const ParamGeneratorInterface&lt;T&gt;* BaseGenerator() const {
+<span class="lineNum">     206 </span>                :            :       return base_;
+<span class="lineNum">     207 </span>                :            :     }
+<span class="lineNum">     208 </span>                :            :     virtual void Advance() {
+<span class="lineNum">     209 </span>                :            :       value_ = value_ + step_;
+<span class="lineNum">     210 </span>                :            :       index_++;
+<span class="lineNum">     211 </span>                :            :     }
+<span class="lineNum">     212 </span>                :            :     virtual ParamIteratorInterface&lt;T&gt;* Clone() const {
+<span class="lineNum">     213 </span>                :            :       return new Iterator(*this);
+<span class="lineNum">     214 </span>                :            :     }
+<span class="lineNum">     215 </span>                :            :     virtual const T* Current() const { return &amp;value_; }
+<span class="lineNum">     216 </span>                :            :     virtual bool Equals(const ParamIteratorInterface&lt;T&gt;&amp; other) const {
+<span class="lineNum">     217 </span>                :            :       // Having the same base generator guarantees that the other
+<span class="lineNum">     218 </span>                :            :       // iterator is of the same type and we can downcast.
+<span class="lineNum">     219 </span>                :            :       GTEST_CHECK_(BaseGenerator() == other.BaseGenerator())
+<span class="lineNum">     220 </span>                :            :           &lt;&lt; &quot;The program attempted to compare iterators &quot;
+<span class="lineNum">     221 </span>                :            :           &lt;&lt; &quot;from different generators.&quot; &lt;&lt; std::endl;
+<span class="lineNum">     222 </span>                :            :       const int other_index =
+<span class="lineNum">     223 </span>                :            :           CheckedDowncastToActualType&lt;const Iterator&gt;(&amp;other)-&gt;index_;
+<span class="lineNum">     224 </span>                :            :       return index_ == other_index;
+<span class="lineNum">     225 </span>                :            :     }
+<span class="lineNum">     226 </span>                :            : 
+<span class="lineNum">     227 </span>                :            :    private:
+<span class="lineNum">     228 </span>                :            :     Iterator(const Iterator&amp; other)
+<span class="lineNum">     229 </span>                :            :         : ParamIteratorInterface&lt;T&gt;(),
+<span class="lineNum">     230 </span>                :            :           base_(other.base_), value_(other.value_), index_(other.index_),
+<span class="lineNum">     231 </span>                :            :           step_(other.step_) {}
+<span class="lineNum">     232 </span>                :            : 
+<span class="lineNum">     233 </span>                :            :     // No implementation - assignment is unsupported.
+<span class="lineNum">     234 </span>                :            :     void operator=(const Iterator&amp; other);
+<span class="lineNum">     235 </span>                :            : 
+<span class="lineNum">     236 </span>                :            :     const ParamGeneratorInterface&lt;T&gt;* const base_;
+<span class="lineNum">     237 </span>                :            :     T value_;
+<span class="lineNum">     238 </span>                :            :     int index_;
+<span class="lineNum">     239 </span>                :            :     const IncrementT step_;
+<span class="lineNum">     240 </span>                :            :   };  // class RangeGenerator::Iterator
+<span class="lineNum">     241 </span>                :            : 
+<span class="lineNum">     242 </span>                :            :   static int CalculateEndIndex(const T&amp; begin,
+<span class="lineNum">     243 </span>                :            :                                const T&amp; end,
+<span class="lineNum">     244 </span>                :            :                                const IncrementT&amp; step) {
+<span class="lineNum">     245 </span>                :            :     int end_index = 0;
+<span class="lineNum">     246 </span>                :            :     for (T i = begin; i &lt; end; i = i + step)
+<span class="lineNum">     247 </span>                :            :       end_index++;
+<span class="lineNum">     248 </span>                :            :     return end_index;
+<span class="lineNum">     249 </span>                :            :   }
+<span class="lineNum">     250 </span>                :            : 
+<span class="lineNum">     251 </span>                :            :   // No implementation - assignment is unsupported.
+<span class="lineNum">     252 </span>                :            :   void operator=(const RangeGenerator&amp; other);
+<span class="lineNum">     253 </span>                :            : 
+<span class="lineNum">     254 </span>                :            :   const T begin_;
+<span class="lineNum">     255 </span>                :            :   const T end_;
+<span class="lineNum">     256 </span>                :            :   const IncrementT step_;
+<span class="lineNum">     257 </span>                :            :   // The index for the end() iterator. All the elements in the generated
+<span class="lineNum">     258 </span>                :            :   // sequence are indexed (0-based) to aid iterator comparison.
+<span class="lineNum">     259 </span>                :            :   const int end_index_;
+<span class="lineNum">     260 </span>                :            : };  // class RangeGenerator
+<span class="lineNum">     261 </span>                :            : 
+<span class="lineNum">     262 </span>                :            : 
+<span class="lineNum">     263 </span>                :            : // Generates values from a pair of STL-style iterators. Used in the
+<span class="lineNum">     264 </span>                :            : // ValuesIn() function. The elements are copied from the source range
+<span class="lineNum">     265 </span>                :            : // since the source can be located on the stack, and the generator
+<span class="lineNum">     266 </span>                :            : // is likely to persist beyond that stack frame.
+<span class="lineNum">     267 </span>                :            : template &lt;typename T&gt;
+<span class="lineNum">     268 </span>                :            : class ValuesInIteratorRangeGenerator : public ParamGeneratorInterface&lt;T&gt; {
+<span class="lineNum">     269 </span>                :            :  public:
+<span class="lineNum">     270 </span>                :            :   template &lt;typename ForwardIterator&gt;
+<a name="271"><span class="lineNum">     271 </span>                :            :   ValuesInIteratorRangeGenerator(ForwardIterator begin, ForwardIterator end)</a>
+<span class="lineNum">     272 </span>                :            :       : container_(begin, end) {}
+<a name="273"><span class="lineNum">     273 </span>[<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>][<span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]:<span class="lineNoCov">          0 :   virtual ~ValuesInIteratorRangeGenerator() {}</span></a>
+<span class="lineNum">     274 </span>                :            : 
+<span class="lineNum">     275 </span>                :<span class="lineNoCov">          0 :   virtual ParamIteratorInterface&lt;T&gt;* Begin() const {</span>
+<a name="276"><span class="lineNum">     276 </span>        [<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     return new Iterator(this, container_.begin());</span></a>
+<span class="lineNum">     277 </span>                :            :   }
+<span class="lineNum">     278 </span>                :<span class="lineNoCov">          0 :   virtual ParamIteratorInterface&lt;T&gt;* End() const {</span>
+<span class="lineNum">     279 </span>        [<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :     return new Iterator(this, container_.end());</span>
+<span class="lineNum">     280 </span>                :            :   }
+<span class="lineNum">     281 </span>                :            : 
+<span class="lineNum">     282 </span>                :            :  private:
+<span class="lineNum">     283 </span>                :            :   typedef typename ::std::vector&lt;T&gt; ContainerType;
+<span class="lineNum">     284 </span>                :            : 
+<a name="285"><span class="lineNum">     285 </span>                :            :   class Iterator : public ParamIteratorInterface&lt;T&gt; {</a>
+<span class="lineNum">     286 </span>                :            :    public:
+<span class="lineNum">     287 </span>                :<span class="lineNoCov">          0 :     Iterator(const ParamGeneratorInterface&lt;T&gt;* base,</span>
+<a name="288"><span class="lineNum">     288 </span>                :            :              typename ContainerType::const_iterator iterator)</a>
+<span class="lineNum">     289 </span>                :<span class="lineNoCov">          0 :         : base_(base), iterator_(iterator) {}</span>
+<a name="290"><span class="lineNum">     290 </span>[<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>][<span class="branchNoExec" title="Branch 6 was not executed"> # </span><span class="branchNoExec" title="Branch 7 was not executed"> # </span>]:<span class="lineNoCov">          0 :     virtual ~Iterator() {}</span></a>
+<span class="lineNum">     291 </span>                :            : 
+<span class="lineNum">     292 </span>                :<span class="lineNoCov">          0 :     virtual const ParamGeneratorInterface&lt;T&gt;* BaseGenerator() const {</span>
+<a name="293"><span class="lineNum">     293 </span>                :<span class="lineNoCov">          0 :       return base_;</span></a>
+<span class="lineNum">     294 </span>                :            :     }
+<span class="lineNum">     295 </span>                :<span class="lineNoCov">          0 :     virtual void Advance() {</span>
+<span class="lineNum">     296 </span>                :<span class="lineNoCov">          0 :       ++iterator_;</span>
+<a name="297"><span class="lineNum">     297 </span>                :<span class="lineNoCov">          0 :       value_.reset();</span></a>
+<span class="lineNum">     298 </span>                :<span class="lineNoCov">          0 :     }</span>
+<span class="lineNum">     299 </span>                :<span class="lineNoCov">          0 :     virtual ParamIteratorInterface&lt;T&gt;* Clone() const {</span>
+<span class="lineNum">     300 </span>        [<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>]:<span class="lineNoCov">          0 :       return new Iterator(*this);</span>
+<span class="lineNum">     301 </span>                :            :     }
+<span class="lineNum">     302 </span>                :            :     // We need to use cached value referenced by iterator_ because *iterator_
+<span class="lineNum">     303 </span>                :            :     // can return a temporary object (and of type other then T), so just
+<span class="lineNum">     304 </span>                :            :     // having &quot;return &amp;*iterator_;&quot; doesn't work.
+<span class="lineNum">     305 </span>                :            :     // value_ is updated here and not in Advance() because Advance()
+<span class="lineNum">     306 </span>                :            :     // can advance iterator_ beyond the end of the range, and we cannot
+<a name="307"><span class="lineNum">     307 </span>                :            :     // detect that fact. The client code, on the other hand, is</a>
+<span class="lineNum">     308 </span>                :            :     // responsible for not calling Current() on an out-of-range iterator.
+<span class="lineNum">     309 </span>                :<span class="lineNoCov">          0 :     virtual const T* Current() const {</span>
+<span class="lineNum">     310 </span>        [<span class="branchNoExec" title="Branch 1 was not executed"> # </span><span class="branchNoExec" title="Branch 2 was not executed"> # </span>]:<span class="lineNoCov">          0 :       if (value_.get() == NULL)</span>
+<span class="lineNum">     311 </span>                :<span class="lineNoCov">          0 :         value_.reset(new T(*iterator_));</span>
+<a name="312"><span class="lineNum">     312 </span>                :<span class="lineNoCov">          0 :       return value_.get();</span></a>
+<span class="lineNum">     313 </span>                :            :     }
+<span class="lineNum">     314 </span>                :<span class="lineNoCov">          0 :     virtual bool Equals(const ParamIteratorInterface&lt;T&gt;&amp; other) const {</span>
+<span class="lineNum">     315 </span>                :            :       // Having the same base generator guarantees that the other
+<span class="lineNum">     316 </span>                :            :       // iterator is of the same type and we can downcast.
+<span class="lineNum">     317 </span>[<span class="branchNoExec" title="Branch 3 was not executed"> # </span><span class="branchNoExec" title="Branch 4 was not executed"> # </span>][<span class="branchNoExec" title="Branch 7 was not executed"> # </span><span class="branchNoExec" title="Branch 8 was not executed"> # </span>]:<span class="lineNoCov">          0 :       GTEST_CHECK_(BaseGenerator() == other.BaseGenerator())</span>
+<span class="lineNum">         </span>[<span class="branchNoExec" title="Branch 10 was not executed"> # </span><span class="branchNoExec" title="Branch 11 was not executed"> # </span>][<span class="branchNoExec" title="Branch 13 was not executed"> # </span><span class="branchNoExec" title="Branch 14 was not executed"> # </span>]
+<span class="lineNum">         </span>        [<span class="branchNoExec" title="Branch 16 was not executed"> # </span><span class="branchNoExec" title="Branch 17 was not executed"> # </span>]
+<span class="lineNum">     318 </span>                :            :           &lt;&lt; &quot;The program attempted to compare iterators &quot;
+<span class="lineNum">     319 </span>                :            :           &lt;&lt; &quot;from different generators.&quot; &lt;&lt; std::endl;
+<span class="lineNum">     320 </span>                :            :       return iterator_ ==
+<span class="lineNum">     321 </span>                :<span class="lineNoCov">          0 :           CheckedDowncastToActualType&lt;const Iterator&gt;(&amp;other)-&gt;iterator_;</span>
+<span class="lineNum">     322 </span>                :            :     }
+<a name="323"><span class="lineNum">     323 </span>                :            : </a>
+<span class="lineNum">     324 </span>                :            :    private:
+<span class="lineNum">     325 </span>                :<span class="lineNoCov">          0 :     Iterator(const Iterator&amp; other)</span>
+<span class="lineNum">     326 </span>                :            :           // The explicit constructor call suppresses a false warning
+<span class="lineNum">     327 </span>                :            :           // emitted by gcc when supplied with the -Wextra option.
+<span class="lineNum">     328 </span>                :            :         : ParamIteratorInterface&lt;T&gt;(),
+<span class="lineNum">     329 </span>                :            :           base_(other.base_),
+<span class="lineNum">     330 </span>                :<span class="lineNoCov">          0 :           iterator_(other.iterator_) {}</span>
+<span class="lineNum">     331 </span>                :            : 
+<span class="lineNum">     332 </span>                :            :     const ParamGeneratorInterface&lt;T&gt;* const base_;
+<span class="lineNum">     333 </span>                :            :     typename ContainerType::const_iterator iterator_;
+<span class="lineNum">     334 </span>                :            :     // A cached value of *iterator_. We keep it here to allow access by
+<span class="lineNum">     335 </span>                :            :     // pointer in the wrapping iterator's operator-&gt;().
+<span class="lineNum">     336 </span>                :            :     // value_ needs to be mutable to be accessed in Current().
+<span class="lineNum">     337 </span>                :            :     // Use of scoped_ptr helps manage cached value's lifetime,
+<span class="lineNum">     338 </span>                :            :     // which is bound by the lifespan of the iterator itself.
+<span class="lineNum">     339 </span>                :            :     mutable scoped_ptr&lt;const T&gt; value_;
+<span class="lineNum">     340 </span>                :            :   };  // class ValuesInIteratorRangeGenerator::Iterator
+<span class="lineNum">     341 </span>                :            : 
+<span class="lineNum">     342 </span>                :            :   // No implementation - assignment is unsupported.
+<span class="lineNum">     343 </span>                :            :   void operator=(const ValuesInIteratorRangeGenerator&amp; other);
+<span class="lineNum">     344 </span>                :            : 
+<span class="lineNum">     345 </span>                :            :   const ContainerType container_;
+<span class="lineNum">     346 </span>                :            : };  // class ValuesInIteratorRangeGenerator
+<span class="lineNum">     347 </span>                :            : 
+<span class="lineNum">     348 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">     349 </span>                :            : //
+<span class="lineNum">     350 </span>                :            : // Stores a parameter value and later creates tests parameterized with that
+<span class="lineNum">     351 </span>                :            : // value.
+<span class="lineNum">     352 </span>                :            : template &lt;class TestClass&gt;
+<span class="lineNum">     353 </span>                :            : class ParameterizedTestFactory : public TestFactoryBase {
+<span class="lineNum">     354 </span>                :            :  public:
+<span class="lineNum">     355 </span>                :            :   typedef typename TestClass::ParamType ParamType;
+<span class="lineNum">     356 </span>                :            :   explicit ParameterizedTestFactory(ParamType parameter) :
+<span class="lineNum">     357 </span>                :            :       parameter_(parameter) {}
+<span class="lineNum">     358 </span>                :            :   virtual Test* CreateTest() {
+<span class="lineNum">     359 </span>                :            :     TestClass::SetParam(&amp;parameter_);
+<span class="lineNum">     360 </span>                :            :     return new TestClass();
+<span class="lineNum">     361 </span>                :            :   }
+<span class="lineNum">     362 </span>                :            : 
+<span class="lineNum">     363 </span>                :            :  private:
+<span class="lineNum">     364 </span>                :            :   const ParamType parameter_;
+<span class="lineNum">     365 </span>                :            : 
+<span class="lineNum">     366 </span>                :            :   GTEST_DISALLOW_COPY_AND_ASSIGN_(ParameterizedTestFactory);
+<span class="lineNum">     367 </span>                :            : };
+<span class="lineNum">     368 </span>                :            : 
+<span class="lineNum">     369 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">     370 </span>                :            : //
+<span class="lineNum">     371 </span>                :            : // TestMetaFactoryBase is a base class for meta-factories that create
+<span class="lineNum">     372 </span>                :            : // test factories for passing into MakeAndRegisterTestInfo function.
+<span class="lineNum">     373 </span>                :            : template &lt;class ParamType&gt;
+<span class="lineNum">     374 </span>                :            : class TestMetaFactoryBase {
+<span class="lineNum">     375 </span>                :            :  public:
+<span class="lineNum">     376 </span>                :            :   virtual ~TestMetaFactoryBase() {}
+<span class="lineNum">     377 </span>                :            : 
+<span class="lineNum">     378 </span>                :            :   virtual TestFactoryBase* CreateTestFactory(ParamType parameter) = 0;
+<span class="lineNum">     379 </span>                :            : };
+<span class="lineNum">     380 </span>                :            : 
+<span class="lineNum">     381 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">     382 </span>                :            : //
+<span class="lineNum">     383 </span>                :            : // TestMetaFactory creates test factories for passing into
+<span class="lineNum">     384 </span>                :            : // MakeAndRegisterTestInfo function. Since MakeAndRegisterTestInfo receives
+<span class="lineNum">     385 </span>                :            : // ownership of test factory pointer, same factory object cannot be passed
+<span class="lineNum">     386 </span>                :            : // into that method twice. But ParameterizedTestCaseInfo is going to call
+<span class="lineNum">     387 </span>                :            : // it for each Test/Parameter value combination. Thus it needs meta factory
+<span class="lineNum">     388 </span>                :            : // creator class.
+<span class="lineNum">     389 </span>                :            : template &lt;class TestCase&gt;
+<span class="lineNum">     390 </span>                :            : class TestMetaFactory
+<span class="lineNum">     391 </span>                :            :     : public TestMetaFactoryBase&lt;typename TestCase::ParamType&gt; {
+<span class="lineNum">     392 </span>                :            :  public:
+<span class="lineNum">     393 </span>                :            :   typedef typename TestCase::ParamType ParamType;
+<span class="lineNum">     394 </span>                :            : 
+<span class="lineNum">     395 </span>                :            :   TestMetaFactory() {}
+<span class="lineNum">     396 </span>                :            : 
+<span class="lineNum">     397 </span>                :            :   virtual TestFactoryBase* CreateTestFactory(ParamType parameter) {
+<span class="lineNum">     398 </span>                :            :     return new ParameterizedTestFactory&lt;TestCase&gt;(parameter);
+<span class="lineNum">     399 </span>                :            :   }
+<span class="lineNum">     400 </span>                :            : 
+<span class="lineNum">     401 </span>                :            :  private:
+<span class="lineNum">     402 </span>                :            :   GTEST_DISALLOW_COPY_AND_ASSIGN_(TestMetaFactory);
+<span class="lineNum">     403 </span>                :            : };
+<span class="lineNum">     404 </span>                :            : 
+<span class="lineNum">     405 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">     406 </span>                :            : //
+<span class="lineNum">     407 </span>                :            : // ParameterizedTestCaseInfoBase is a generic interface
+<span class="lineNum">     408 </span>                :            : // to ParameterizedTestCaseInfo classes. ParameterizedTestCaseInfoBase
+<span class="lineNum">     409 </span>                :            : // accumulates test information provided by TEST_P macro invocations
+<span class="lineNum">     410 </span>                :            : // and generators provided by INSTANTIATE_TEST_CASE_P macro invocations
+<span class="lineNum">     411 </span>                :            : // and uses that information to register all resulting test instances
+<span class="lineNum">     412 </span>                :            : // in RegisterTests method. The ParameterizeTestCaseRegistry class holds
+<span class="lineNum">     413 </span>                :            : // a collection of pointers to the ParameterizedTestCaseInfo objects
+<span class="lineNum">     414 </span>                :            : // and calls RegisterTests() on each of them when asked.
+<a name="415"><span class="lineNum">     415 </span>                :            : class ParameterizedTestCaseInfoBase {</a>
+<span class="lineNum">     416 </span>                :            :  public:
+<span class="lineNum">     417 </span>        [<span class="branchNoExec" title="Branch 2 was not executed"> # </span><span class="branchNoExec" title="Branch 3 was not executed"> # </span>]:<span class="lineNoCov">          0 :   virtual ~ParameterizedTestCaseInfoBase() {}</span>
+<span class="lineNum">     418 </span>                :            : 
+<span class="lineNum">     419 </span>                :            :   // Base part of test case name for display purposes.
+<span class="lineNum">     420 </span>                :            :   virtual const string&amp; GetTestCaseName() const = 0;
+<span class="lineNum">     421 </span>                :            :   // Test case id to verify identity.
+<span class="lineNum">     422 </span>                :            :   virtual TypeId GetTestCaseTypeId() const = 0;
+<span class="lineNum">     423 </span>                :            :   // UnitTest class invokes this method to register tests in this
+<span class="lineNum">     424 </span>                :            :   // test case right before running them in RUN_ALL_TESTS macro.
+<span class="lineNum">     425 </span>                :            :   // This method should not be called more then once on any single
+<span class="lineNum">     426 </span>                :            :   // instance of a ParameterizedTestCaseInfoBase derived class.
+<span class="lineNum">     427 </span>                :            :   virtual void RegisterTests() = 0;
+<span class="lineNum">     428 </span>                :            : 
+<span class="lineNum">     429 </span>                :            :  protected:
+<span class="lineNum">     430 </span>                :            :   ParameterizedTestCaseInfoBase() {}
+<span class="lineNum">     431 </span>                :            : 
+<span class="lineNum">     432 </span>                :            :  private:
+<span class="lineNum">     433 </span>                :            :   GTEST_DISALLOW_COPY_AND_ASSIGN_(ParameterizedTestCaseInfoBase);
+<span class="lineNum">     434 </span>                :            : };
+<span class="lineNum">     435 </span>                :            : 
+<span class="lineNum">     436 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">     437 </span>                :            : //
+<span class="lineNum">     438 </span>                :            : // ParameterizedTestCaseInfo accumulates tests obtained from TEST_P
+<span class="lineNum">     439 </span>                :            : // macro invocations for a particular test case and generators
+<span class="lineNum">     440 </span>                :            : // obtained from INSTANTIATE_TEST_CASE_P macro invocations for that
+<span class="lineNum">     441 </span>                :            : // test case. It registers tests with all values generated by all
+<span class="lineNum">     442 </span>                :            : // generators when asked.
+<span class="lineNum">     443 </span>                :            : template &lt;class TestCase&gt;
+<span class="lineNum">     444 </span>                :            : class ParameterizedTestCaseInfo : public ParameterizedTestCaseInfoBase {
+<span class="lineNum">     445 </span>                :            :  public:
+<span class="lineNum">     446 </span>                :            :   // ParamType and GeneratorCreationFunc are private types but are required
+<span class="lineNum">     447 </span>                :            :   // for declarations of public methods AddTestPattern() and
+<span class="lineNum">     448 </span>                :            :   // AddTestCaseInstantiation().
+<span class="lineNum">     449 </span>                :            :   typedef typename TestCase::ParamType ParamType;
+<span class="lineNum">     450 </span>                :            :   // A function that returns an instance of appropriate generator type.
+<span class="lineNum">     451 </span>                :            :   typedef ParamGenerator&lt;ParamType&gt;(GeneratorCreationFunc)();
+<span class="lineNum">     452 </span>                :            : 
+<span class="lineNum">     453 </span>                :            :   explicit ParameterizedTestCaseInfo(const char* name)
+<span class="lineNum">     454 </span>                :            :       : test_case_name_(name) {}
+<span class="lineNum">     455 </span>                :            : 
+<span class="lineNum">     456 </span>                :            :   // Test case base name for display purposes.
+<span class="lineNum">     457 </span>                :            :   virtual const string&amp; GetTestCaseName() const { return test_case_name_; }
+<span class="lineNum">     458 </span>                :            :   // Test case id to verify identity.
+<span class="lineNum">     459 </span>                :            :   virtual TypeId GetTestCaseTypeId() const { return GetTypeId&lt;TestCase&gt;(); }
+<span class="lineNum">     460 </span>                :            :   // TEST_P macro uses AddTestPattern() to record information
+<span class="lineNum">     461 </span>                :            :   // about a single test in a LocalTestInfo structure.
+<span class="lineNum">     462 </span>                :            :   // test_case_name is the base name of the test case (without invocation
+<span class="lineNum">     463 </span>                :            :   // prefix). test_base_name is the name of an individual test without
+<span class="lineNum">     464 </span>                :            :   // parameter index. For the test SequenceA/FooTest.DoBar/1 FooTest is
+<span class="lineNum">     465 </span>                :            :   // test case base name and DoBar is test base name.
+<span class="lineNum">     466 </span>                :            :   void AddTestPattern(const char* test_case_name,
+<span class="lineNum">     467 </span>                :            :                       const char* test_base_name,
+<span class="lineNum">     468 </span>                :            :                       TestMetaFactoryBase&lt;ParamType&gt;* meta_factory) {
+<span class="lineNum">     469 </span>                :            :     tests_.push_back(linked_ptr&lt;TestInfo&gt;(new TestInfo(test_case_name,
+<span class="lineNum">     470 </span>                :            :                                                        test_base_name,
+<span class="lineNum">     471 </span>                :            :                                                        meta_factory)));
+<span class="lineNum">     472 </span>                :            :   }
+<span class="lineNum">     473 </span>                :            :   // INSTANTIATE_TEST_CASE_P macro uses AddGenerator() to record information
+<span class="lineNum">     474 </span>                :            :   // about a generator.
+<span class="lineNum">     475 </span>                :            :   int AddTestCaseInstantiation(const string&amp; instantiation_name,
+<span class="lineNum">     476 </span>                :            :                                GeneratorCreationFunc* func,
+<span class="lineNum">     477 </span>                :            :                                const char* /* file */,
+<span class="lineNum">     478 </span>                :            :                                int /* line */) {
+<span class="lineNum">     479 </span>                :            :     instantiations_.push_back(::std::make_pair(instantiation_name, func));
+<span class="lineNum">     480 </span>                :            :     return 0;  // Return value used only to run this method in namespace scope.
+<span class="lineNum">     481 </span>                :            :   }
+<span class="lineNum">     482 </span>                :            :   // UnitTest class invokes this method to register tests in this test case
+<span class="lineNum">     483 </span>                :            :   // test cases right before running tests in RUN_ALL_TESTS macro.
+<span class="lineNum">     484 </span>                :            :   // This method should not be called more then once on any single
+<span class="lineNum">     485 </span>                :            :   // instance of a ParameterizedTestCaseInfoBase derived class.
+<span class="lineNum">     486 </span>                :            :   // UnitTest has a guard to prevent from calling this method more then once.
+<span class="lineNum">     487 </span>                :            :   virtual void RegisterTests() {
+<span class="lineNum">     488 </span>                :            :     for (typename TestInfoContainer::iterator test_it = tests_.begin();
+<span class="lineNum">     489 </span>                :            :          test_it != tests_.end(); ++test_it) {
+<span class="lineNum">     490 </span>                :            :       linked_ptr&lt;TestInfo&gt; test_info = *test_it;
+<span class="lineNum">     491 </span>                :            :       for (typename InstantiationContainer::iterator gen_it =
+<span class="lineNum">     492 </span>                :            :                instantiations_.begin(); gen_it != instantiations_.end();
+<span class="lineNum">     493 </span>                :            :                ++gen_it) {
+<span class="lineNum">     494 </span>                :            :         const string&amp; instantiation_name = gen_it-&gt;first;
+<span class="lineNum">     495 </span>                :            :         ParamGenerator&lt;ParamType&gt; generator((*gen_it-&gt;second)());
+<span class="lineNum">     496 </span>                :            : 
+<span class="lineNum">     497 </span>                :            :         Message test_case_name_stream;
+<span class="lineNum">     498 </span>                :            :         if ( !instantiation_name.empty() )
+<span class="lineNum">     499 </span>                :            :           test_case_name_stream &lt;&lt; instantiation_name &lt;&lt; &quot;/&quot;;
+<span class="lineNum">     500 </span>                :            :         test_case_name_stream &lt;&lt; test_info-&gt;test_case_base_name;
+<span class="lineNum">     501 </span>                :            : 
+<span class="lineNum">     502 </span>                :            :         int i = 0;
+<span class="lineNum">     503 </span>                :            :         for (typename ParamGenerator&lt;ParamType&gt;::iterator param_it =
+<span class="lineNum">     504 </span>                :            :                  generator.begin();
+<span class="lineNum">     505 </span>                :            :              param_it != generator.end(); ++param_it, ++i) {
+<span class="lineNum">     506 </span>                :            :           Message test_name_stream;
+<span class="lineNum">     507 </span>                :            :           test_name_stream &lt;&lt; test_info-&gt;test_base_name &lt;&lt; &quot;/&quot; &lt;&lt; i;
+<span class="lineNum">     508 </span>                :            :           MakeAndRegisterTestInfo(
+<span class="lineNum">     509 </span>                :            :               test_case_name_stream.GetString().c_str(),
+<span class="lineNum">     510 </span>                :            :               test_name_stream.GetString().c_str(),
+<span class="lineNum">     511 </span>                :            :               NULL,  // No type parameter.
+<span class="lineNum">     512 </span>                :            :               PrintToString(*param_it).c_str(),
+<span class="lineNum">     513 </span>                :            :               GetTestCaseTypeId(),
+<span class="lineNum">     514 </span>                :            :               TestCase::SetUpTestCase,
+<span class="lineNum">     515 </span>                :            :               TestCase::TearDownTestCase,
+<span class="lineNum">     516 </span>                :            :               test_info-&gt;test_meta_factory-&gt;CreateTestFactory(*param_it));
+<span class="lineNum">     517 </span>                :            :         }  // for param_it
+<span class="lineNum">     518 </span>                :            :       }  // for gen_it
+<span class="lineNum">     519 </span>                :            :     }  // for test_it
+<span class="lineNum">     520 </span>                :            :   }  // RegisterTests
+<span class="lineNum">     521 </span>                :            : 
+<span class="lineNum">     522 </span>                :            :  private:
+<span class="lineNum">     523 </span>                :            :   // LocalTestInfo structure keeps information about a single test registered
+<span class="lineNum">     524 </span>                :            :   // with TEST_P macro.
+<span class="lineNum">     525 </span>                :            :   struct TestInfo {
+<span class="lineNum">     526 </span>                :            :     TestInfo(const char* a_test_case_base_name,
+<span class="lineNum">     527 </span>                :            :              const char* a_test_base_name,
+<span class="lineNum">     528 </span>                :            :              TestMetaFactoryBase&lt;ParamType&gt;* a_test_meta_factory) :
+<span class="lineNum">     529 </span>                :            :         test_case_base_name(a_test_case_base_name),
+<span class="lineNum">     530 </span>                :            :         test_base_name(a_test_base_name),
+<span class="lineNum">     531 </span>                :            :         test_meta_factory(a_test_meta_factory) {}
+<span class="lineNum">     532 </span>                :            : 
+<span class="lineNum">     533 </span>                :            :     const string test_case_base_name;
+<span class="lineNum">     534 </span>                :            :     const string test_base_name;
+<span class="lineNum">     535 </span>                :            :     const scoped_ptr&lt;TestMetaFactoryBase&lt;ParamType&gt; &gt; test_meta_factory;
+<span class="lineNum">     536 </span>                :            :   };
+<span class="lineNum">     537 </span>                :            :   typedef ::std::vector&lt;linked_ptr&lt;TestInfo&gt; &gt; TestInfoContainer;
+<span class="lineNum">     538 </span>                :            :   // Keeps pairs of &lt;Instantiation name, Sequence generator creation function&gt;
+<span class="lineNum">     539 </span>                :            :   // received from INSTANTIATE_TEST_CASE_P macros.
+<span class="lineNum">     540 </span>                :            :   typedef ::std::vector&lt;std::pair&lt;string, GeneratorCreationFunc*&gt; &gt;
+<span class="lineNum">     541 </span>                :            :       InstantiationContainer;
+<span class="lineNum">     542 </span>                :            : 
+<span class="lineNum">     543 </span>                :            :   const string test_case_name_;
+<span class="lineNum">     544 </span>                :            :   TestInfoContainer tests_;
+<span class="lineNum">     545 </span>                :            :   InstantiationContainer instantiations_;
+<span class="lineNum">     546 </span>                :            : 
+<span class="lineNum">     547 </span>                :            :   GTEST_DISALLOW_COPY_AND_ASSIGN_(ParameterizedTestCaseInfo);
+<span class="lineNum">     548 </span>                :            : };  // class ParameterizedTestCaseInfo
+<span class="lineNum">     549 </span>                :            : 
+<span class="lineNum">     550 </span>                :            : // INTERNAL IMPLEMENTATION - DO NOT USE IN USER CODE.
+<span class="lineNum">     551 </span>                :            : //
+<span class="lineNum">     552 </span>                :            : // ParameterizedTestCaseRegistry contains a map of ParameterizedTestCaseInfoBase
+<span class="lineNum">     553 </span>                :            : // classes accessed by test case names. TEST_P and INSTANTIATE_TEST_CASE_P
+<span class="lineNum">     554 </span>                :            : // macros use it to locate their corresponding ParameterizedTestCaseInfo
+<span class="lineNum">     555 </span>                :            : // descriptors.
+<span class="lineNum">     556 </span>                :            : class ParameterizedTestCaseRegistry {
+<span class="lineNum">     557 </span>                :            :  public:
+<span class="lineNum">     558 </span>                :            :   ParameterizedTestCaseRegistry() {}
+<span class="lineNum">     559 </span>                :            :   ~ParameterizedTestCaseRegistry() {
+<span class="lineNum">     560 </span>                :            :     for (TestCaseInfoContainer::iterator it = test_case_infos_.begin();
+<span class="lineNum">     561 </span>                :            :          it != test_case_infos_.end(); ++it) {
+<span class="lineNum">     562 </span>                :            :       delete *it;
+<span class="lineNum">     563 </span>                :            :     }
+<span class="lineNum">     564 </span>                :            :   }
+<span class="lineNum">     565 </span>                :            : 
+<span class="lineNum">     566 </span>                :            :   // Looks up or creates and returns a structure containing information about
+<span class="lineNum">     567 </span>                :            :   // tests and instantiations of a particular test case.
+<span class="lineNum">     568 </span>                :            :   template &lt;class TestCase&gt;
+<span class="lineNum">     569 </span>                :            :   ParameterizedTestCaseInfo&lt;TestCase&gt;* GetTestCasePatternHolder(
+<span class="lineNum">     570 </span>                :            :       const char* test_case_name,
+<span class="lineNum">     571 </span>                :            :       const char* file,
+<span class="lineNum">     572 </span>                :            :       int line) {
+<span class="lineNum">     573 </span>                :            :     ParameterizedTestCaseInfo&lt;TestCase&gt;* typed_test_info = NULL;
+<span class="lineNum">     574 </span>                :            :     for (TestCaseInfoContainer::iterator it = test_case_infos_.begin();
+<span class="lineNum">     575 </span>                :            :          it != test_case_infos_.end(); ++it) {
+<span class="lineNum">     576 </span>                :            :       if ((*it)-&gt;GetTestCaseName() == test_case_name) {
+<span class="lineNum">     577 </span>                :            :         if ((*it)-&gt;GetTestCaseTypeId() != GetTypeId&lt;TestCase&gt;()) {
+<span class="lineNum">     578 </span>                :            :           // Complain about incorrect usage of Google Test facilities
+<span class="lineNum">     579 </span>                :            :           // and terminate the program since we cannot guaranty correct
+<span class="lineNum">     580 </span>                :            :           // test case setup and tear-down in this case.
+<span class="lineNum">     581 </span>                :            :           ReportInvalidTestCaseType(test_case_name,  file, line);
+<span class="lineNum">     582 </span>                :            :           posix::Abort();
+<span class="lineNum">     583 </span>                :            :         } else {
+<span class="lineNum">     584 </span>                :            :           // At this point we are sure that the object we found is of the same
+<span class="lineNum">     585 </span>                :            :           // type we are looking for, so we downcast it to that type
+<span class="lineNum">     586 </span>                :            :           // without further checks.
+<span class="lineNum">     587 </span>                :            :           typed_test_info = CheckedDowncastToActualType&lt;
+<span class="lineNum">     588 </span>                :            :               ParameterizedTestCaseInfo&lt;TestCase&gt; &gt;(*it);
+<span class="lineNum">     589 </span>                :            :         }
+<span class="lineNum">     590 </span>                :            :         break;
+<span class="lineNum">     591 </span>                :            :       }
+<span class="lineNum">     592 </span>                :            :     }
+<span class="lineNum">     593 </span>                :            :     if (typed_test_info == NULL) {
+<span class="lineNum">     594 </span>                :            :       typed_test_info = new ParameterizedTestCaseInfo&lt;TestCase&gt;(test_case_name);
+<span class="lineNum">     595 </span>                :            :       test_case_infos_.push_back(typed_test_info);
+<span class="lineNum">     596 </span>                :            :     }
+<span class="lineNum">     597 </span>                :            :     return typed_test_info;
+<span class="lineNum">     598 </span>                :            :   }
+<span class="lineNum">     599 </span>                :            :   void RegisterTests() {
+<span class="lineNum">     600 </span>                :            :     for (TestCaseInfoContainer::iterator it = test_case_infos_.begin();
+<span class="lineNum">     601 </span>                :            :          it != test_case_infos_.end(); ++it) {
+<span class="lineNum">     602 </span>                :            :       (*it)-&gt;RegisterTests();
+<span class="lineNum">     603 </span>                :            :     }
+<span class="lineNum">     604 </span>                :            :   }
+<span class="lineNum">     605 </span>                :            : 
+<span class="lineNum">     606 </span>                :            :  private:
+<span class="lineNum">     607 </span>                :            :   typedef ::std::vector&lt;ParameterizedTestCaseInfoBase*&gt; TestCaseInfoContainer;
+<span class="lineNum">     608 </span>                :            : 
+<span class="lineNum">     609 </span>                :            :   TestCaseInfoContainer test_case_infos_;
+<span class="lineNum">     610 </span>                :            : 
+<span class="lineNum">     611 </span>                :            :   GTEST_DISALLOW_COPY_AND_ASSIGN_(ParameterizedTestCaseRegistry);
+<span class="lineNum">     612 </span>                :            : };
+<span class="lineNum">     613 </span>                :            : 
+<span class="lineNum">     614 </span>                :            : }  // namespace internal
+<span class="lineNum">     615 </span>                :            : }  // namespace testing
+<span class="lineNum">     616 </span>                :            : 
+<span class="lineNum">     617 </span>                :            : #endif  //  GTEST_HAS_PARAM_TEST
+<span class="lineNum">     618 </span>                :            : 
+<span class="lineNum">     619 </span>                :            : #endif  // GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PARAM_UTIL_H_
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../../../../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.9</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>
