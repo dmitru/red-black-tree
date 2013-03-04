@@ -49,6 +49,9 @@ int main(int argc, char **argv)
     a[i] = rand() % 1000;
     btree_insert(tree, (void*)&a[i]);
   }
+  for (int i = 0; i < n / 2; ++i) {
+    btree_remove(btree_find(tree, &a[i]));
+  }
   int expected_height = 2 * ceil(log(n + 1) / log(2)) + 1;
   btree_dump_dot(tree, node_attrs);
   btree_destroy(tree);

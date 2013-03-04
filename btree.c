@@ -20,8 +20,6 @@ BTree* btree_create(int (*cmp) (void *, void *))
   BTree *t = (BTree*)malloc(sizeof(BTree));
   t->cmp = cmp;
   t->root = NULL;
-  t->begin = NULL;
-  t->end = NULL;
   return t;
 }
 
@@ -30,41 +28,17 @@ bool btree_isempty(BTree *t)
   return t->root == NULL;
 }
 
-/*static char* node_dump(Node *n)
-{
-  const size_t buf_sz = 1024;
-  static char str[buf_sz];
-  if (n != NULL)
-    snprintf(str, buf_sz, "%3d%c", *(int*)(n->data), (n->color == BTREE_RED)? 'r' : 'b');
-  else
-    snprintf(str, buf_sz, "NILb"  );
-  return str;
-}*/
-
-
 static Node* insert_helper(BTree *t, Node **node, Node *parent, void *data)
 {
   if ((*node) == NULL) {
     Node *new_node = (Node*)malloc(sizeof(Node)); 
     if (new_node == NULL) 
       return NULL;
-    if (t->root == NULL) {
-      t->begin = new_node;
-      t->end = new_node;
-    }
     *node = new_node;
     (*node)->data = data; 
     (*node)->parent = parent;
     (*node)->left = NULL;
-    (*node)->right = NULL;
-    if (parent != NULL) {
-      if (parent == t->begin && parent->left == *node) {
-        t->begin = *node;
-      }
-      else if (parent == t->end && parent->right == *node) {
-        t->end = *node;
-      }
-    }
+    (*node)->right = NULL;  
     return *node;
   } 
   int cmp_result = (*(t->cmp))(data, (*node)->data);
@@ -169,11 +143,9 @@ bool btree_insert(BTree *tree, void *data)
 static BTreeIterator find_helper(BTree *tree, Node *node, void *data)
 {
   if (node == NULL) {
-    ////DUMP("find_helper(%p, NULL, %d)\n", tree, *(int*)data);
     BTreeIterator res = {tree, NULL};
     return res;
   }
-  ////DUMP("find_helper(%p, %d, %d)\n", tree, *(int*)node->data, *(int*)data);
   int cmp_result = (*(tree->cmp))(data, node->data);
   if (cmp_result == 0) {
     BTreeIterator res = {tree, node};
@@ -187,7 +159,6 @@ static BTreeIterator find_helper(BTree *tree, Node *node, void *data)
 
 BTreeIterator btree_find(BTree *tree, void *data)
 {
-  ////DUMP("btree_find(%d)\n", *(int*)data);
   return find_helper(tree, tree->root, data);
 }
 
@@ -200,68 +171,100 @@ static Node* down_to_leftmost_child(Node *t)
 {
   if (t == NULL)
     return NULL;
-  if (t->left)
+  if (t->left != NULL)
     return down_to_leftmost_child(t->left);
   else
     return t;
 }
 
-static Node* down_to_rightmost_child(Node *t)
+static void remove_fixup(BTree *tree, Node *x, Node *yp)
 {
-  if (t == NULL)
-    return NULL;
-  if (t->right)
-    return down_to_rightmost_child(t->right);
-  else
-    return t;
+  while (x != tree->root && COLOR(x) == BTREE_BLACK) {
+    Node *xp = (x == NULL)? yp : x->parent;
+    if (x == xp->left) {
+      Node *w = xp->right; 
+      if (COLOR(w) == BTREE_RED) {
+        w->color = BTREE_BLACK;
+        xp->color = BTREE_RED;
+        left_rotation(tree, xp);
+        w = xp->right;
+      }
+      if (COLOR(w->left) == BTREE_BLACK && COLOR(w->right) == BTREE_BLACK) {
+        w->color = BTREE_RED;
+        x = xp;
+      } else {
+        if (COLOR(w->right) == BTREE_BLACK) {
+          w->left->color = BTREE_BLACK;
+          w->color = BTREE_RED;
+          right_rotation(tree, w);
+          w = xp->right;
+        }
+        w->color = xp->color;
+        xp->color = BTREE_BLACK;
+        w->right->color = BTREE_BLACK;
+        left_rotation(tree, xp);
+        x = tree->root;
+      }
+    } else {
+      Node *w = xp->left; 
+      if (COLOR(w) == BTREE_RED) {
+        w->color = BTREE_BLACK;
+        xp->color = BTREE_RED;
+        right_rotation(tree, xp);
+        w = xp->left;
+      }
+      if (COLOR(w->right) == BTREE_BLACK && COLOR(w->left) == BTREE_BLACK) {
+        w->color = BTREE_RED;
+        x = xp;
+      } else {
+        if (COLOR(w->left) == BTREE_BLACK) {
+          w->right->color = BTREE_BLACK;
+          w->color = BTREE_RED;
+          left_rotation(tree, w);
+          w = xp->left;
+        }
+        w->color = xp->color;
+        xp->color = BTREE_BLACK;
+        w->left->color = BTREE_BLACK;
+        right_rotation(tree, xp);
+        x = tree->root;
+      }
+    }
+  }
+  if (x != NULL)
+    x->color = BTREE_BLACK;
 }
 
 void btree_remove(BTreeIterator it)
 {
-  ////DUMP("btree_remove(%d)\n", *(int*)it->data);
-  BTree *tree = it.tree;
-  Node *node = it.node;
-  if (node == NULL)
+  Node *z = it.node;
+  if (z == NULL)
     return;
-  if (node->left == NULL && node->right == NULL) { // Node has no children
-    if (node->parent == NULL) { // We're removing the root
-      tree->root = NULL;
-      tree->begin = NULL;
-      tree->end = NULL;
-    } else { 
-      if (node->parent->left == node)
-        node->parent->left = NULL;
-      else
-        node->parent->right = NULL;
-    }
-  } else if (node->left != NULL && node->right != NULL) { // Node has both children
-    BTreeIterator next = btree_next(it);
-    node->data = next.node->data;
-    return btree_remove(next);
-  } else if (node->left != NULL) {
-    node->left->parent = node->parent;
-    if (node->parent != NULL) {
-      if (node->parent->left == node) 
-        node->parent->left = node->left;
-     else
-        node->parent->right = node->left;
-    } else {
-      tree->root = node->left;
-    }
+  Node *y = NULL;
+  if (z->left == NULL || z->right == NULL)
+    y = z;
+  else
+    y = down_to_leftmost_child(z);
+  Node *x = NULL;
+  if (y->left != NULL)
+    x = y->left;
+  else
+    x = y->right;
+  if (x != NULL)
+    x->parent = y->parent;
+  if (y->parent == NULL) {
+    it.tree->root = x;
   } else {
-    node->right->parent = node->parent;
-    if (node->parent != NULL) {
-      if (node->parent->left == node) 
-        node->parent->left = node->right;
-     else
-        node->parent->right = node->right;
-    } else {
-      tree->root = node->right;
-    }
+    if (y == y->parent->left) 
+      y->parent->left = x;
+    else
+      y->parent->right = x;
   }
-  free(node);
-  tree->begin = down_to_leftmost_child(tree->root);
-  tree->end = down_to_rightmost_child(tree->root);
+  if (y != z)
+    z->data = y->data;
+  if (COLOR(y) == BTREE_BLACK)
+    remove_fixup(it.tree, x, y->parent);
+  free(y);
 }
 
 BTreeIterator btree_begin(BTree *tree)
@@ -281,7 +284,6 @@ static Node* up_to_first_right(Node *t)
 
 BTreeIterator btree_next(BTreeIterator it)
 {
-  ////DUMP("btree_next()\n");
   Node *node = it.node;
   if (node->right != NULL) {
     BTreeIterator res = {it.tree, down_to_leftmost_child(node->right)};
@@ -315,7 +317,6 @@ static void destroy_helper(Node *node)
 
 void btree_destroy(BTree *tree)
 {
-  ////DUMP("btree_destroy()\n");
   destroy_helper(tree->root);
   free(tree);
 }

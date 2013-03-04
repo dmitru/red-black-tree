@@ -18,8 +18,6 @@ struct Node {
 
 struct BTree {
   struct Node *root;
-  struct Node *begin;
-  struct Node *end;
   int (*cmp)(void *, void *);
 };
 
