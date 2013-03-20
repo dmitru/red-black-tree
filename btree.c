@@ -12,12 +12,13 @@
 #define DUMP(format, ...) 
 #endif
 
-#define TOINT(x) ((x == NULL)? -1 : *((int*)(x)->data))
 #define COLOR(node) (((node) == NULL)? BTREE_BLACK : (node)->color)
 
 BTree* btree_create(int (*cmp) (void *, void *))
 {
   BTree *t = (BTree*)malloc(sizeof(BTree));
+  if (t == NULL)
+    return NULL;
   t->cmp = cmp;
   t->root = NULL;
   return t;
@@ -32,8 +33,10 @@ static Node* insert_helper(BTree *t, Node **node, Node *parent, void *data)
 {
   if ((*node) == NULL) {
     Node *new_node = (Node*)malloc(sizeof(Node)); 
-    if (new_node == NULL) 
+    if (new_node == NULL) {
+      //DUMP("Achtung!\n");
       return NULL;
+    }
     *node = new_node;
     (*node)->data = data; 
     (*node)->parent = parent;
@@ -43,7 +46,7 @@ static Node* insert_helper(BTree *t, Node **node, Node *parent, void *data)
   } 
   int cmp_result = (*(t->cmp))(data, (*node)->data);
   if (cmp_result == 0) {
-    return NULL;
+    return *node;
   } else if (cmp_result > 0) {
     return insert_helper(t, &((*node)->right), *node, data);
   } else {
@@ -92,8 +95,11 @@ static void right_rotation(BTree *tree, Node *y)
 bool btree_insert(BTree *tree, void *data)
 { 
   Node *x = NULL;
-  if ((x = insert_helper(tree, &tree->root, NULL, data)) == NULL)
+  if ((x = insert_helper(tree, &tree->root, NULL, data)) == NULL) {
+    //DUMP("HAENDE HOCH\n");
     return false;
+  }
+  //DUMP("%p\n", x);
   x->color = BTREE_RED;
   while (COLOR(x->parent) == BTREE_RED) {
     Node *p = x->parent;

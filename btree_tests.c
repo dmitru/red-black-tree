@@ -69,7 +69,7 @@ static char* node_dump(Node *n)
   return str;
 }
 
-TEST(DISABLEDBalancedTreeTests, CreateDestroyTest) {
+TEST(BalancedTreeTests, CreateDestroyTest) {
   BTree *tree = btree_create(int_compare);
   EXPECT_TRUE(btree_isempty(tree));
   btree_destroy(tree);
@@ -107,7 +107,7 @@ TEST(BalancedTreeTests, InsertRemoveMemberTest1) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, InsertRemoveMemberTest2) {
+TEST(BalancedTreeTests, InsertRemoveMemberTest2) {
   BTree *tree = btree_create(int_compare);
   int x = 1;
   btree_insert(tree, (void*)&x);
@@ -119,7 +119,7 @@ TEST(DISABLEDBalancedTreeTests, InsertRemoveMemberTest2) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, IteratorTest1) {
+TEST(BalancedTreeTests, IteratorTest1) {
   srand(time(NULL));
   BTree *tree = btree_create(int_compare);
   int a[] = {1, 3, 2, 5, -1, 19, 15, 45, 9, 6, -4};
@@ -139,7 +139,7 @@ TEST(DISABLEDBalancedTreeTests, IteratorTest1) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, IteratorTest2) {
+TEST(BalancedTreeTests, IteratorTest2) {
   BTree *tree = btree_create(int_compare);
   int a = 1;
   btree_insert(tree, (void*)&a);
@@ -157,7 +157,7 @@ TEST(DISABLEDBalancedTreeTests, IteratorTest2) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, TreeHeightTest) {
+TEST(BalancedTreeTests, DISABLED_TreeHeightTest) {
   srand(time(NULL));
   BTree *tree = btree_create(int_compare);
   const int n = 10000;
@@ -172,7 +172,7 @@ TEST(DISABLEDBalancedTreeTests, TreeHeightTest) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, TreeDumpTest) {
+TEST(BalancedTreeTests, TreeDumpTest) {
   srand(time(NULL));
   BTree *tree = btree_create(int_compare);
   const int n = 10;
@@ -186,7 +186,7 @@ TEST(DISABLEDBalancedTreeTests, TreeDumpTest) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, RedBlackPropertiesTest) {
+TEST(BalancedTreeTests, DISABLED_RedBlackPropertiesTest) {
   srand(time(NULL));
   BTree *tree = btree_create(int_compare);
 
@@ -203,7 +203,7 @@ TEST(DISABLEDBalancedTreeTests, RedBlackPropertiesTest) {
   btree_destroy(tree);
 }
 
-TEST(DISABLEDBalancedTreeTests, InsertRemoveMemberTest3) {
+TEST(BalancedTreeTests, DISABLED_InsertRemoveMemberTest3) {
   srand(time(NULL));
   BTree *tree = btree_create(int_compare);
 
@@ -229,5 +229,39 @@ TEST(DISABLEDBalancedTreeTests, InsertRemoveMemberTest3) {
     btree_remove(btree_find(tree, (void*)&a[i]));
   }
   ASSERT_TRUE(is_correct_rb_tree(tree->root));
+  btree_destroy(tree);
+}
+
+TEST(BalancedTreeTests, DISABLED_LargeTreeMemTest) {
+  srand(time(NULL));
+  BTree *tree = btree_create(int_compare);
+  ASSERT_FALSE(tree == NULL);
+  const int n = 3600000;
+  int *a = (int*)malloc(sizeof(int) * n);
+  ASSERT_FALSE(a == NULL);
+  for (int i = 0; i < n; ++i) {
+    a[i] = i;
+  }
+  for (int i = 0; i < n; ++i) {
+    //DUMP("%d\n", *a);
+    if (btree_insert(tree, (void*)&a[i]) == false) {
+      DUMP("Can't allocate node, exiting!\n");
+      ASSERT_FALSE(true);
+    }
+  }
+  int expected_height = 2 * ceil(log(n + 1) / log(2)) + 1;
+  DUMP("Tree height: %d, theoretical upper bound: %d\n", btree_height(tree), expected_height);
+  EXPECT_TRUE(btree_height(tree) < expected_height);
+  btree_destroy(tree);
+}
+
+TEST(BalancedTreeTests, RemoveEmptyNodeTest) {
+  srand(time(NULL));
+  BTree *tree = btree_create(int_compare);
+  btree_destroy(tree);
+
+  tree = btree_create(int_compare);
+  BTreeIterator it = btree_begin(tree);
+  btree_remove(it);
   btree_destroy(tree);
 }
