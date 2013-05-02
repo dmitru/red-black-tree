@@ -55,10 +55,11 @@ clean:
 	rm -rf ./*.png
 	rm -rf ./*.gcda ./*gcno
 
+.PHONY: draw
 # make draw - render a random tree in a png file
 draw: draw_tree.o btree.o 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $(DRAW_BIN) draw_tree.o btree.o
-	./draw 1000 > tree.dot
+	./draw 30 > tree.dot
 	dot -Tpng ./tree.dot > tree.png
 
 draw_tree.o: draw_tree.c
